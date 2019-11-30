@@ -6,7 +6,11 @@ Base numbers for the model defined as "Net" are:
 | :-----------------: | :------: |
 | **Training Accuracy** | 99.1 % |
 | **Validation Accuracy** | 97.9 % |
-| **FPS** | 189 |
+| **FPS** | 200 |
+| **FLOPS**| 29,438,464 |
 
 
-The numbers are on a system with an Intel 6700H processor with 16 GB of RAM using PyTorch.
+Configuration:
+1. **Platform**: Windows 10
+2. **Processor**: Intel i7-6700HQ
+3. **RAM**: 16 GB
