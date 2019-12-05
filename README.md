@@ -1,5 +1,4 @@
-# compression
-## A compressed MNIST classifier
+# A compressed MNIST classifier
 
 This repository implements a version of filter pruning similar to ["PRUNING CONVOLUTIONAL NEURAL NETWORKS FOR RESOURCE EFFICIENT INFERENCE"](https://arxiv.org/pdf/1611.06440.pdf), albeit in a bit more primitive fashion. The goal is to create a small MNIST classifier with inference speed in mind and **not** the model disk size itself (however, the model disk size is also reduced as a side effect). We will start by establishing a baseline.
 
@@ -32,7 +31,7 @@ System Configuration:
 
 
 ## Related work
----------------
+
 There has been a lot of work around neural network compression which can be classified into four categories:
 
 1. **Weight Pruning**: 
@@ -55,7 +54,7 @@ There has been a lot of work around neural network compression which can be clas
 
 
 ## Our Approach
----------------
+
 We use a form of filter pruning discussed in the paper linked above. This methodology essentially eliminates filters from all the convolution layers in the network. We have just two convolution layers in our network from which we will eliminate one filter after another till the drop in accuracy is not acceptable anymore.
 
 First, comes the selection criteria or the so called "sensitivity analysis". We are trying to figure out which filters are the least important in the network or in other words which filters is the network least "sensitive" towards. There are multiple ways of evaluating this but in the paper they use "Taylor expansion" to gauge the difference in loss likely to occur when a filter in question is removed. Whichever filter has the least impact on the loss, therefore, is the least important. We could implement it by brute forcing and evaluating losses when every filter is removed. In this repository, this method is **not** implemented since the development of such would take time.
@@ -72,7 +71,7 @@ We first remove the weights of the first convolution layer yeilding the followin
 | 4 | 99.6 % | 97.9 % | 147 | 28.5M | 102 MB |
 | 8 | 99.5 % | 97.9 % | 145 | 27.5M | 102 MB |
 | 12 | 99.4 % | 97.7 % | 147 | 26.5M | 102 MB |
-| <font color='#ff6477'>15</font> | <font color='#ff6477'>97.2 %</font> | <font color='#ff6477'>94.1 %</font> | <font color='#ff6477'>150</font> | <font color='#ff6477'>25.9M</font>  | <font color='#ff6477'>102 MB</font> |
+| **15** | **97.2 %** | **94.1 %** | **150** | **25.9M**  | **102 MB** |
 
 So what's happening here? Why is there only a reduction of 4 million FLOPs when there is a reduction of 15 out of 16 filters? This is because the weights matrix of shapes [16, 1, 3, 3] (Conv 2D - 1) and [32, 16, 3, 3] (Conv 2D - 2) reduce by only 297 parameters everytime a filter from the first layer is deducted.
 
@@ -84,7 +83,7 @@ So what's happening here? Why is there only a reduction of 4 million FLOPs when 
 | 16 | 97.8 % | 96.5 % | 266 | 14M | 51 MB |
 | 24 | 97.0 % | 95.9 % | 580 | 7.4M | 26 MB |
 | 30 | 96.7 % | 96.3 % | 2770 | 1.9M | 6.5 MB |
-| <font color='#ff6477'>31</font> | <font color='#ff6477'>95.4 %</font> | <font color='#ff6477'>94.5 %</font> | <font color='#ff6477'>3427</font> | <font color='#ff6477'>1M</font> | <font color='#ff6477'>3.3 MB</font> |
+| **31** | **95.4 %** | **94.5 %** | **3427** | **1M** | **3.3 MB** |
 
 In contrast, since the second convolution layer is connected to a FC layer, a single filter reduction results in a reduction of 800,000 parameters. Its more effective to reduce parameters in this layer.
 
@@ -97,7 +96,7 @@ In contrast, since the second convolution layer is connected to a FC layer, a si
 | 6, 31 | 95.9 % | 95.5 % | 3700 | 0.9M | 3.3 MB |
 | 4, 31 | 96.0 % | 94.8 % | 3800 | 1M | 3.3 MB |
 | 15, 30 | 96.5 % | 95.5 % | 3300 | 1.6M | 6.5 MB |
-| <font color='#149300'>12, 30</font> | <font color='#149300'>97.3 %</font> | <font color='#149300'>96.0 %</font> | <font color='#149300'>3300</font> | <font color='#149300'>1.7M</font> | <font color='#149300'>6.5 MB</font> |
+| **12, 30** | **97.3 %** | **96.0 %** | **3300** | **1.7M** | **6.5 MB** |
 
 That's exactly what we do in the final pruning stage. We try to prune as much of the last layer as we can while varying the pruning in the first layer to achieve the optimum network.
 
@@ -109,7 +108,6 @@ Why not go for other approaches?
 
 
 ## Results
--------------
 
 | | Base | Pruned | Improvement |
 |-| :--: | :----: | :---------: |
@@ -125,7 +123,7 @@ But how do we know if the neural network is actually learning anything? Activati
 
 
 ## Future enhancements
-----------------------
+
 1. For a real world scenario i.e. for deploying on mobiles, drones or other low power systems quatization could in fact be a very viable solution.
 2. These numbers could be further improved if run on a GPU
 3. Furthermore, the current code will not work well for deeper networks. These networks would require a much more sophisticated selection process like the Taylor expansion to really know the importance of the network.
